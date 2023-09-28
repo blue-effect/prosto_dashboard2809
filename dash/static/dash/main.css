@@ -1,0 +1,15 @@
+.table-container {
+    max-height: 640px;
+}
+
+.download-excel {
+    max-width: fit-content;
+}
+
+.bg-gray-100 {
+    background: #f8f9fa;
+}
+
+select[multiple] {
+    display: none !important;
+}
