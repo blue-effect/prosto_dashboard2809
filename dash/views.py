@@ -5,7 +5,7 @@ from django.utils import timezone
 from .forms import FilterFormTvshows, FilterFormProgram, FilterFormGeneral
 from .models import ChannelView, CityView, ContentView
 from .models import Report2023, Report2022, Report2021, Report2020, Report2019
-from .models import ReportGeneral2023View, ReportGeneral2022View, ReportGeneral2021View, ReportGeneral2020View, ReportGeneral2019View
+from .models import ReportGeneral2019View, ReportGeneral2020View, ReportGeneral2021View, ReportGeneral2022View, ReportGeneral2023View
 from django.db import connection
 from io import BytesIO
 import json
@@ -47,6 +47,7 @@ def tvshows_report(request):
 
     if request.GET:
         form = FilterFormTvshows(request.GET)
+        form.fields['channel_id'].choices = ChannelView.objects.values_list('id', 'name')
 
     if form.is_valid():
         channel_id = form.cleaned_data['channel_id']
@@ -89,12 +90,9 @@ def tvshows_report(request):
 def get_titles(request):
     title = request.GET.get('query', '')
 
-    if title:
-        data = ContentView.objects.all()
-        data = list(data.filter(name__icontains=title).values(
-            'name')[:10])
-    else:
-        data = ''
+    data = ContentView.objects.all()
+    data = list(data.filter(name__icontains=title).values(
+        'name')[:100])
 
     return JsonResponse({'data': data})
 
@@ -105,8 +103,7 @@ def generate_programs_report(request):
 
     if request.GET:
         form = FilterFormProgram(request.GET)
-        form.fields['titles'].choices = ContentView.objects.values_list(
-            'name', 'name')
+        form.fields['titles'].choices = ContentView.objects.values_list('name', 'name')
 
     if form.is_valid():
         channel_id = form.cleaned_data['channel_id']
@@ -114,9 +111,13 @@ def generate_programs_report(request):
         year = form.cleaned_data['year']
         titles = form.cleaned_data['titles']
 
-        if channel_id:
+        if channel_id: 
+            # if channel_id == -1:
             data = REPORTS[year].filter(
-                channel_id__in=channel_id, city_id=city_id, title__in=titles)
+                channel_id__in=channel_id, 
+                city_id=city_id, 
+                title__in=titles
+            )
         else:
             data = REPORTS[year].filter(city_id=city_id, title__in=titles)
 
@@ -143,8 +144,6 @@ def generate_programs_report(request):
         report = report.to_html(classes="table table-bordered")
     except NameError:
         report = None
-
-    form.fields['titles'].choices = ()
 
     return render(request, 'dash/programs.html', {
         'form': form,
@@ -185,11 +184,6 @@ def general_report(request):
                 report["dt"]).year
             report["month"] = pd.DatetimeIndex(
                 report["dt"]).month
-
-            # mediahills_channel = mediahills_channel[(mediahills_channel['year'] == 2023)
-            #                                                 & (mediahills_channel['month'] == 2)
-            #                                         & (mediahills_channel['city_id'] == 446)]
-
             report["day"] = pd.DatetimeIndex(
                 report["dt"]).day
             report["time"] = pd.DatetimeIndex(
@@ -305,13 +299,5 @@ def generate_tvshows_report(query):
 
     report = to_graph.sort_values(
         by=['tvr', 'date'], ascending=False)
-
-    # def make_pretty(styler):
-    #     styler.set_caption("Рейтинг программ канала")
-    #     styler.background_gradient(
-    #         axis="columns", vmin=1, vmax=5, cmap="YlGnBu")
-    #     return styler
-
-    # to_graph_sort.style.pipe(make_pretty)
 
     return report

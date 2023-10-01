@@ -26,26 +26,73 @@ MONTHS = (
 )
 
 
-class FilterForm(forms.Form):
-    channel_id = forms.MultipleChoiceField(label="Название канала", widget=forms.SelectMultiple(attrs={'id': 'select-channels'}), choices=ChannelView.objects.values_list('id', 'name')
-                                           )
-    city_id = forms.ChoiceField(label="Название города",
-                                choices=reversed(CityView.objects.values_list('id', 'name')), widget=forms.Select(attrs={'class': 'form-select'}))
+class FilterFormTvshows(forms.Form):
+    channel_id = forms.MultipleChoiceField(
+        label="Название канала", 
+        widget=forms.SelectMultiple(attrs={'id': 'select-channels'}), 
+        choices=ChannelView.objects.values_list('id', 'name')
+    )
+
+    city_id = forms.ChoiceField(
+        label="Название города",
+        choices=reversed(CityView.objects.values_list('id', 'name')), 
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
     year = forms.ChoiceField(
-        label="Год", widget=forms.Select(attrs={'class': 'form-select'}), choices=YEARS)
+        label="Год", 
+        widget=forms.Select(attrs={'class': 'form-select'}), 
+        choices=YEARS
+    )
 
+class FilterFormProgram(forms.Form):
+    channel_id = forms.MultipleChoiceField(
+        label="Название канала", 
+        widget=forms.SelectMultiple(
+        attrs={'id': 'select-channels'}), 
+        required=False, 
+        choices=ChannelView.objects.values_list('id', 'name')
+    )
 
-class FilterFormTvshows(FilterForm):
-    pass
+    city_id = forms.ChoiceField(
+        label="Название города",
+        choices=reversed(CityView.objects.values_list('id', 'name')), 
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
 
+    year = forms.ChoiceField(
+        label="Год", 
+        widget=forms.Select(attrs={'class': 'form-select'}), 
+        choices=YEARS
+    )
 
-class FilterFormProgram(FilterForm):
-    channel_id = forms.MultipleChoiceField(label="Название канала", widget=forms.SelectMultiple(
-        attrs={'id': 'select-channels'}), choices=ChannelView.objects.values_list('id', 'name'), required=False)
     titles = forms.MultipleChoiceField(
-        label="Программы для отчета", widget=forms.SelectMultiple(attrs={'id': 'select-programs'}))
+        label="Программы для отчета", 
+        widget=forms.SelectMultiple(attrs={'id': 'select-programs'}),
+        choices=ContentView.objects.values_list('name', 'name')
+    )
 
+class FilterFormGeneral(forms.Form):
+    channel_id = forms.MultipleChoiceField(
+        label="Название канала", 
+        widget=forms.SelectMultiple(attrs={'id': 'select-channels'}), 
+        choices=ChannelView.objects.values_list('id', 'name')
+    )
 
-class FilterFormGeneral(FilterForm):
-    month = forms.ChoiceField(label="Месяц", widget=forms.Select(
-        attrs={'class': 'form-select'}), choices=MONTHS)
+    city_id = forms.ChoiceField(
+        label="Название города",
+        choices=reversed(CityView.objects.values_list('id', 'name')), 
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    year = forms.ChoiceField(
+        label="Год", 
+        widget=forms.Select(attrs={'class': 'form-select'}), 
+        choices=YEARS
+    )
+
+    month = forms.ChoiceField(
+        label="Месяц", 
+        widget=forms.Select(attrs={'class': 'form-select'}), 
+        choices=MONTHS
+    )

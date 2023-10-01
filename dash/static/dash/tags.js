@@ -152,7 +152,7 @@ const DEFAULTS = {
   addOnBlur: false,
   showDisabled: false,
   hideNativeValidation: false,
-  suggestionsThreshold: 1,
+  suggestionsThreshold: 0,
   maximumItems: 0,
   autoselectFirst: true,
   updateOnSelect: false,

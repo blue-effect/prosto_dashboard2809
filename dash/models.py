@@ -26,6 +26,7 @@ class Report(models.Model):
     class Meta:
         managed = False
         abstract = True
+        
 
 
 class Report2023(Report):
